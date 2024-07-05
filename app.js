@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const pool = require('./config/database')
 const router = require('./router')
+app.use(express.json());
 app.use('/api', router);
 
 app.listen(process.env.PORT,() =>{
