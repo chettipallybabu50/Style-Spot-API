@@ -1,0 +1,91 @@
+const bcrypt = require('bcrypt');
+
+const pool = require('../config/database')
+
+const signupuser = async (req,res) =>{
+    console.log('------->>>req', req.body)
+    console.log('------->>>req.username', req.body.username)
+    try{
+        const {username, password, confirm_password} = req.body
+        console.log('------>>>username, password, confirm_password',username, password, confirm_password )
+        const existinguser = await pool.query('SELECT * FROM sellerdetails WHERE username = $1', [username])
+        console.log('--------->>>existinguser', existinguser.rows)
+        console.log('--------->>>existinguser.rowCount', existinguser.rowCount)
+        if(existinguser.rowCount> 0){
+           return  res.status(200).send({
+                   message:'user already existed',
+                   status : false,
+                   data : existinguser.rows
+
+            })
+        }else{
+            console.log('---------->>>>coming to else part')
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const hashedConfirmPassword = await bcrypt.hash(confirm_password, saltRounds);
+            console.log('------------->>>hashedPassword', hashedPassword)
+            console.log('------------->>>hashedConfirmPassword', hashedConfirmPassword)
+              const newuser = await pool.query(
+            'INSERT INTO sellerdetails (username, password, confirm_password) VALUES ($1, $2, $3) RETURNING user_id',
+            [username, hashedPassword, hashedConfirmPassword]
+        );
+            console.log('---------->>>>newuser.rows',newuser.rows)
+             console.log('---------->>>>newuser.rowCount',newuser.rowCount)
+
+            if(newuser.rowCount> 0){
+                return res.status(200).send({
+                      message:'user created successfully',
+                      status : true,
+                })
+
+            }
+        }
+
+    }catch(err){
+        console.log('------->>>err', err)
+            return res.status(500).send({
+            message: 'Internal server error',
+            status: false
+        });
+
+    }
+
+}
+
+const signinuser = async(req,res) =>{
+    console.log('----->>>sign in req', req.body)
+    try{
+        const {username,password} = req.body
+        const getuser = await pool.query('SELECT * FROM sellerdetails WHERE username = $1', [username])
+        console.log('--------->>>getuser', getuser.rows)
+        const user = getuser.rows[0]
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('--------->>>isMatch', isMatch)
+        if(isMatch){
+             return res.status(200).send({
+            message:'login successfully',
+            status : true
+        }) 
+        }
+        else{
+        return res.status(400).send({
+            message:'Invalid username or Password',
+            status : false
+        })
+       }
+
+    }catch(err){
+        console.log('----------->>>sign in err',err)
+            return res.status(500).send({
+            message: 'Internal server error',
+            status: false
+        });
+
+    }
+
+}
+
+module.exports = {
+    signupuser,
+    signinuser
+}
