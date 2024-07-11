@@ -1,6 +1,8 @@
 require('dotenv').config()
 const express = require('express')
+const cors = require('cors');
 const app = express()
+app.use(cors());
 const pool = require('./config/database')
 const router = require('./router')
 app.use(express.json());
