@@ -4,9 +4,10 @@ const pool = require('../config/database')
 
 const signupuser = async (req,res) =>{
     console.log('------->>>req', req.body)
-    console.log('------->>>req.username', req.body.username)
     try{
-        const {username, password, confirm_password} = req.body
+         const { signupdata } = req.body
+         console.log('---------->>>signupdata',signupdata)
+        const {username, password, confirm_password} = signupdata
         console.log('------>>>username, password, confirm_password',username, password, confirm_password )
         const existinguser = await pool.query('SELECT * FROM sellerdetails WHERE username = $1', [username])
         console.log('--------->>>existinguser', existinguser.rows)
