@@ -31,6 +31,7 @@ const signupuser = async (req,res) =>{
             [username, hashedPassword, hashedConfirmPassword]
         );
             console.log('---------->>>>newuser.rows',newuser.rows)
+             console.log('---------->>>>newuser',newuser)
              console.log('---------->>>>newuser.rowCount',newuser.rowCount)
 
             if(newuser.rowCount> 0){
@@ -60,16 +61,23 @@ const signinuser = async(req,res) =>{
         const getuser = await pool.query('SELECT * FROM sellerdetails WHERE username = $1', [username])
         console.log('--------->>>getuser', getuser.rows)
         const user = getuser.rows[0]
+        console.log('------->>>user',user)
+        console.log('------->>>user.username',user.username)
+        const data ={
+            username:user.username,
+            user_id : user.user_id
+        }
         const isMatch = await bcrypt.compare(password, user.password);
         console.log('--------->>>isMatch', isMatch)
         if(isMatch){
              return res.status(200).send({
-            message:'login successfully',
-            status : true
+                data:data,
+                message:'login successfully',
+                status : true
         }) 
         }
         else{
-        return res.status(400).send({
+        return res.status(200).send({
             message:'Invalid username or Password',
             status : false
         })
