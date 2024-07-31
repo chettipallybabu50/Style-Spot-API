@@ -38,6 +38,7 @@ const signupuser = async (req,res) =>{
                 return res.status(200).send({
                       message:'user created successfully',
                       status : true,
+                      data: newuser.rows[0]
                 })
 
             }
