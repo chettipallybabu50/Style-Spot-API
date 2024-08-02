@@ -1,14 +1,28 @@
 const pool = require('../config/database')
+const multer = require('multer')
+
+const ds= multer.diskStorage({
+    destination:'product-uploads/',
+    filename:(req, file, cb)=>{
+        cb(null,Date.now()+file.originalname)
+    }
+})
+const upload = multer({
+    storage:ds
+})
 
 const addProduct = async (req,res) =>{
     console.log('------>>>product req',req.body)
+    console.log('------>>>product_file_path',req.file)
     try{
         const {product_name,product_price,product_category,product_color,product_description,user_id} = req.body
         console.log('------>>>product_name, product_price, product_category, product_color, product_description',product_name, product_price,product_category,product_color,product_description)
+        const product_file_path = req.file ? req.file.path : null;
+        console.log('---->>product_file_path11111, ',product_file_path)
 
         const result = await pool.query(
-            'INSERT INTO products (product_name,product_price,product_category,product_color,product_description,user_id, added_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING product_id ',
-            [product_name, product_price, product_category, product_color, product_description,user_id, new Date()]
+            'INSERT INTO products (product_name,product_price,product_category,product_color,product_description,user_id, added_date, product_file_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING product_id ',
+            [product_name, product_price, product_category, product_color, product_description,user_id, new Date(), product_file_path]
 
         )
         console.log("------>>add product result ",result.rows)
@@ -66,6 +80,7 @@ const getproduct =async(req,res)=>{
 
 module.exports ={
     addProduct,
-    getproduct
+    getproduct,
+    upload
 
 }
