@@ -17,7 +17,8 @@ const addProduct = async (req,res) =>{
     try{
         const {product_name,product_price,product_category,product_color,product_description,user_id} = req.body
         console.log('------>>>product_name, product_price, product_category, product_color, product_description',product_name, product_price,product_category,product_color,product_description)
-        const product_file_path = req.file ? req.file.path : null;
+        // const product_file_path = req.file ? req.file.path : null;
+        const product_file_path = req.file ? req.file.filename : null;
         console.log('---->>product_file_path11111, ',product_file_path)
 
         const result = await pool.query(
