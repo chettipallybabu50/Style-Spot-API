@@ -4,7 +4,7 @@ const multer = require('multer');
 const app = express()
 const {getstudentinfo}  = require('./controller/student')
 const {signupuser,signinuser} = require('./controller/signup')
-const {addProduct, getproduct, upload} = require('./controller/products')
+const {addProduct, getproduct, upload, Deleteproduct} = require('./controller/products')
 app.get('/studentinfo', getstudentinfo);
 
 //seller API'S
@@ -14,5 +14,6 @@ app.post('/signinuser', signinuser)
 //Product API's
 app.post('/add-product', upload.single('product_file_path'),addProduct)
 app.get('/getAllproducts',getproduct)
+app.delete('/delete-product',Deleteproduct)
 
 module.exports = app;

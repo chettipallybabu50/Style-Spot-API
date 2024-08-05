@@ -61,7 +61,7 @@ const getproduct =async(req,res)=>{
                 data: result.rows
             })
         }else{
-            return res.status(400).send({
+            return res.status(200).send({
                 message:'No data found',
                 status:false
             })
@@ -79,9 +79,52 @@ const getproduct =async(req,res)=>{
     }
 }
 
+const Deleteproduct = async(req,res)=>{
+    console.log('------>>>delete request',req.query)
+    try{
+        const {product_id,user_id} = req.query
+        console.log('to delethe the product product_id,', product_id, user_id)
+
+        if (!product_id || !user_id) {
+            return res.status(400).json({ error: 'product_id and user_id are required' });
+          }
+
+        const result = await pool.query(
+            'DELETE FROM products WHERE product_id = $1 AND user_id = $2 RETURNING *',
+            [product_id, user_id]
+          );
+          console.log('---->>>result.rows',result.rows)
+          console.log('---->>>result.rows[0]',result.rows[0])
+          console.log('---->>>result.rowCount',result.rowCount)
+          if(result.rowCount>0){
+            return res.status(200).send({
+                message :'Product deleted successfully',
+                status : true,
+                data: result.rows[0]
+            })
+          }else{
+            return res.status(400).send({
+                message:'No product to delete',
+                status : false
+            })
+          }
+
+    }
+    catch(err){
+        console.log('---->>>delete product error ')
+        return res.status(500).send({
+            message: 'Internal server error',
+            status: false
+
+        })
+
+    }
+}
+
 module.exports ={
     addProduct,
     getproduct,
-    upload
+    upload,
+    Deleteproduct
 
 }
