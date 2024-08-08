@@ -46,6 +46,37 @@ const addProduct = async (req,res) =>{
     }
 }
 
+const UpdateProduct = async(req,res) =>{
+    try{
+        const {product_name,product_price,product_category,product_color,product_description,user_id, product_id} = req.body
+        const product_file_path = req.file ? req.file.filename : null;
+        const result = await pool.query(
+            'UPDATE products SET product_name =$1, product_price =$2, product_category=$3, product_color=$4,product_description=$5,product_file_path=$6, updated_at=$7 WHERE user_id =$8 AND product_id=$9 RETURNING * ',
+            [product_name, product_price, product_category, product_color,product_description,product_file_path,new Date() , user_id, product_id]
+        )
+        if(result.rowCount> 0){
+            return res.status(200).send({
+                message :'Product details updated successfully',
+                status : true,
+                data : result.rows[0]
+            })
+        }else{
+            return res.status(400).send({
+                message:'Product not found',
+                status: false
+            })
+        }
+
+    }
+    catch(err){
+        return res.status(500).send({
+            message:'Internal server error',
+            status: false
+        })
+
+    }
+}
+
 const getproduct =async(req,res)=>{
     console.log('the get product request')
     try{
@@ -117,7 +148,6 @@ const Deleteproduct = async(req,res)=>{
             status: false
 
         })
-
     }
 }
 
@@ -125,6 +155,7 @@ module.exports ={
     addProduct,
     getproduct,
     upload,
-    Deleteproduct
+    Deleteproduct,
+    UpdateProduct
 
 }
