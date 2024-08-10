@@ -151,11 +151,47 @@ const Deleteproduct = async(req,res)=>{
     }
 }
 
+const getProductbyId = async(req,res)=>{
+    console.log('------>>>delete request',req.query)
+    try{
+        const {product_id,user_id} = req.query
+        console.log('---->>>product_id,user_id ', product_id, user_id)
+        const result = await pool.query(
+              'select *from products WHERE product_id = $1 AND user_id = $2 ',
+              [product_id, user_id]
+        );
+        console.log('---->>>details by id count ', result.rowCount)
+        console.log('---->>>details by id rows', result.rows[0])
+        if(result.rowCount>0){
+            return res.status(200).send({
+                message:'Successful',
+                status: true,
+                data: result.rows[0]
+            })
+        }else{
+            return res.status(400).send({
+                message:'No Data Found',
+                status: false
+            })
+        }
+
+    }
+    catch(err){
+        console.log('---->>get by id error',err)
+        return res.status(500).send({
+            message: 'Internal server error',
+            status: false
+
+        })
+    }
+}
+
 module.exports ={
     addProduct,
     getproduct,
     upload,
     Deleteproduct,
-    UpdateProduct
+    UpdateProduct,
+    getProductbyId
 
 }
