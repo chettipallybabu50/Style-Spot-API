@@ -51,7 +51,7 @@ const UpdateProduct = async(req,res) =>{
         const {product_name,product_price,product_category,product_color,product_description,user_id, product_id} = req.body
         const product_file_path = req.file ? req.file.filename : null;
         const result = await pool.query(
-            'UPDATE products SET product_name =$1, product_price =$2, product_category=$3, product_color=$4,product_description=$5,product_file_path=$6, updated_at=$7 WHERE user_id =$8 AND product_id=$9 RETURNING * ',
+            'UPDATE products SET product_name =$1, product_price =$2, product_category=$3, product_color=$4,product_description=$5, product_file_path = COALESCE($6, product_file_path) , updated_at=$7 WHERE user_id =$8 AND product_id=$9 RETURNING * ',
             [product_name, product_price, product_category, product_color,product_description,product_file_path,new Date() , user_id, product_id]
         )
         if(result.rowCount> 0){
