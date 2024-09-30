@@ -186,12 +186,48 @@ const getProductbyId = async(req,res)=>{
     }
 }
 
+const getsearchProduct = async (req, res) => {
+    console.log('---------->>>search product', req.query)
+    try {
+        const query = req.query.query
+        console.log('--------->>>query', query)
+        const result = await pool.query(
+            `SELECT * FROM products WHERE product_name ILIKE $1 OR product_category ILIKE $1`,
+            [`%${query}%`]
+        )
+        console.log('------>>>products', result.rows)
+        console.log('------>>>products', result.rowCount)
+        if (result.rowCount > 0) {
+            return res.status(200).send({
+                message: 'Successful',
+                data: result.rows,
+                status: true
+            })
+        }
+        else {
+            return res.status(400).send({
+                message: 'No Product Found',
+                status: false
+            })
+        }
+    }
+    catch (err) {
+        console.log('---->>>delete product error ')
+        return res.status(500).send({
+            message: 'Internal server error',
+            status: false
+
+        })
+    }
+}
+
 module.exports ={
     addProduct,
     getproduct,
     upload,
     Deleteproduct,
     UpdateProduct,
-    getProductbyId
+    getProductbyId,
+    getsearchProduct
 
 }
